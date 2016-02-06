@@ -12,13 +12,10 @@ public class InputFileReader {
         ArrayList<String> linesOfText = new ArrayList<>();
 
         try {
-
             try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-                String sCurrentLine = null;
-
+                String sCurrentLine;
                 while ((sCurrentLine = br.readLine()) != null) {
                     linesOfText.add(sCurrentLine);
-                    System.out.println(sCurrentLine);
                 }
             }
         } catch (IOException e) {
