@@ -69,6 +69,7 @@ public class Main {
                 System.out.println("to be NOTed: " + varToNot);
             } else if (signal.contains("LSHIFT")) {
 
+
             } else if (signal.contains("RSHIFT")) {
 
             } else {
