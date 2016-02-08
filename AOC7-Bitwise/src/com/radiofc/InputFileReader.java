@@ -15,6 +15,7 @@ public class InputFileReader {
             try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
                 String sCurrentLine;
                 while ((sCurrentLine = br.readLine()) != null) {
+                    System.out.println("Line: "+ sCurrentLine);
                     linesOfText.add(sCurrentLine);
                 }
             }
