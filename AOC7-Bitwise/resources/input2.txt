@@ -5,5 +5,6 @@ x OR y -> e
 x LSHIFT 2 -> f
 y RSHIFT 2 -> g
 NOT x -> h
+ht -> da
 NOT y -> i
-i -> x
+it -> xa
