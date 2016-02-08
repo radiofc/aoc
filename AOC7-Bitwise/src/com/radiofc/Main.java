@@ -118,6 +118,7 @@ public class Main {
                 performRShiftOperation(baseSignals, wireList, it, pair, signal);*/
             } else {
                 System.out.println("Signal: " + signal + " wire: " + aSignal.getWire());
+
                 if (isInteger(signal)) {
                     Wire wire = new Wire(aSignal.getWire(), Integer.parseInt(signal));
                     wireList.add(wire);
