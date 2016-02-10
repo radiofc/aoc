@@ -7,6 +7,9 @@ public class Wire {
     private String identifier;
     private int signal;
 
+    public void setSignal(int signal) {
+        this.signal = signal;
+    }
 
     public Wire(String identifier, int signal) {
         this.identifier = identifier;

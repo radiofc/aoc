@@ -1,9 +1,6 @@
 package com.radiofc;
 
-import java.awt.*;
-import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -11,51 +8,31 @@ public class Main {
 
     public static void main(String[] args) {
 
-        ArrayList<String> instructionList = InputFileReader.readFile("C:\\Users\\eshamcc\\IdeaProjects\\AOC7-Bitwise\\resources\\input2.txt");
+        ArrayList<String> instructionList = InputFileReader.readFile("C:\\Users\\eshamcc\\Dropbox\\git\\aoc\\AOC7-Bitwise\\resources\\input3.txt");
 
-
-      //  HashMap<String, String> signalMap = processInstructions(instructionList);
         ArrayList<Signal> signalList = processInstructions(instructionList);
         ArrayList<Wire> baseSignals = getBaseSignals(signalList);
-        //  printMap(signalMap);
-     //   ArrayList<Wire> allSignals = processMap(signalList, baseSignals);
-     //   allSignals = processMap(signalList, baseSignals);
-     //   System.out.println("The wires: ");
-     //   for (Wire w : allSignals) {
-     //       System.out.println(w.getIdentifier() + " - " + w.getSignal());
-     //   }
-     /*   processMap(signalMap, baseSignals);
-        processMap(signalMap, baseSignals);
-        processMap(signalMap, baseSignals)
-        // signalMap.
-        long a = 456;	/* 60 = 0011 1100
-        long b = 456;	/* 13 = 0000 1101 */
-     /*   long c = 0;
+        ArrayList<Wire> allSignals = processMap(signalList, baseSignals);
 
-        c = ~a;
-
-        // c = bitwiseAnd(a, b);       /* 12 = 0000 1100 */
-    //    System.out.println("~a: " + c);
+        System.out.println("*****************\nThe wires: ");
+        for (Wire w : allSignals) {
+           System.out.println(w.getIdentifier() + " - " + w.getSignal());
+        }
+        int a = 123;
+        int b = 127;
+        int c = a & b;
+        System.out.println("a & b: " + c);
     }
 
     private static ArrayList<Signal> processInstructions(ArrayList<String> instructionList) {
-      //  HashMap<String, String> signalMap = new HashMap<>();
         ArrayList<Signal> signalList = new ArrayList<>();
         for (String instruction : instructionList) {
             System.out.println(instruction);
             String[] parts = instruction.split(" -> ");
-           // String signal = parts[0];
-           // String wire = parts[1];
             Signal signal = new Signal(parts[0], parts[1]);
-           // signalMap.put(wire, signal);
             signalList.add(signal);
-            //    System.out.println("Signal: "+signal+" Wire: "+wire);
         }
         return signalList;
-    }
-
-    private static int bitwiseAnd(int a, int b) {
-        return a & b;
     }
 
     public static void printMap(Map mp) {
@@ -75,13 +52,12 @@ public class Main {
 
         for (Signal aSignal : signalList) {
             String signal = aSignal.getName();
-            System.out.println("doing signal: "+signal);
+           // System.out.println("doing signal: "+signal);
 
             if (!signal.contains("AND") && !signal.contains("OR") && !signal.contains("NOT") && !signal.contains("LSHIFT") && !signal.contains("RSHIFT")) {
                 if (isInteger(signal)) {
                     System.out.println("Signal: " + signal + " wire: " + aSignal.getWire());
-                    Wire wire = new Wire(aSignal.getWire(), Integer.parseInt(signal));
-                    wireList.add(wire);
+                    addWireToList(wireList, aSignal.getWire(), Integer.parseInt(signal));
                 }
             }
         }
@@ -98,12 +74,13 @@ public class Main {
         ArrayList<Wire> wireList = new ArrayList<>();
         wireList.addAll(baseSignals);
 
-       // Iterator it = mp.entrySet().iterator();
+        System.out.println("The wires in processMap: ");
+        for (Wire w : wireList) {
+            System.out.println(w.getIdentifier() + " - " + w.getSignal());
+        }
+        System.out.println("+++++++++++++++++++++++++++++++++");
 
-     //   while (it.hasNext()) {
         for (Signal aSignal : signalList) {
-          //  Map.Entry pair = (Map.Entry) it.next();
-         //   String signal = pair.getValue().toString();
             String signal = aSignal.getName();
             String wireName = aSignal.getWire();
             if (signal.contains("AND")) {
@@ -120,13 +97,11 @@ public class Main {
                 System.out.println("Signal: " + signal + " wire: " + aSignal.getWire());
 
                 if (isInteger(signal)) {
-                    Wire wire = new Wire(aSignal.getWire(), Integer.parseInt(signal));
-                    wireList.add(wire);
+                    addWireToList(wireList, aSignal.getWire(), Integer.parseInt(signal));
                 } else {
                     for (Wire wire : baseSignals) {
                         if (wire.getIdentifier().equals(signal)) {
-                            Wire wire1 = new Wire(aSignal.getWire(), wire.getSignal());
-                            wireList.add(wire1);
+                            addWireToList(wireList, aSignal.getWire(), wire.getSignal());
                           //  it.remove();
                             break;
                         }
@@ -135,13 +110,26 @@ public class Main {
                 }
 
             }
-            //String[] parts = pair.getValue().toString().split(" ");
-
-            //     System.out.println(pair.getKey() + " = " + pair.getValue());
-
         }
-        //   }
 
+        System.out.println("The wires in processMap 2: ");
+        for (Wire w : wireList) {
+            System.out.println(w.getIdentifier() + " - " + w.getSignal());
+        }
+        System.out.println("+++++++++++++++++++++++++++++++++");
+
+        return wireList;
+    }
+
+    private static ArrayList<Wire> addWireToList(ArrayList<Wire> wireList, String identifier, int signal) {
+        for (Wire wire : wireList) {
+            if (wire.getIdentifier().equals(identifier)) {
+                wire.setSignal(signal);
+                return wireList;
+            }
+        }
+        Wire wire = new Wire(identifier, signal);
+        wireList.add(wire);
         return wireList;
     }
 
@@ -161,8 +149,7 @@ public class Main {
         if ((val1 > 0) && (val2 > 0)) {
             int res = val1 & val2;
             System.out.println(part1 + " - AND - " + part2 + " wire: " + wireName + " = " + res);
-            Wire wire = new Wire(wireName, res);
-            wireList.add(wire);
+            wireList = addWireToList(wireList, wireName, res);
           //  it.remove();    // avoids a ConcurrentModificationException
         }
     }
@@ -178,8 +165,7 @@ public class Main {
         if ((val1 > 0) && (val2 > 0)) {
             int res = val1 | val2;
             System.out.println(part1 + " - OR - " + part2 + " wire: " + pair.getKey() + " = " + res);
-            Wire wire = new Wire(pair.getKey().toString(), res);
-            wireList.add(wire);
+            addWireToList(wireList, pair.getKey().toString(), res);
             it.remove();    // avoids a ConcurrentModificationException
         }
     }
@@ -194,8 +180,7 @@ public class Main {
                 val1 = wire.getSignal();
                 int res = val1 >> val2;
                 System.out.println(part1 + " - RSHIFT - " + part2 + " wire: " + pair.getKey() + " = " + res);
-                Wire wire1 = new Wire(pair.getKey().toString(), res);
-                wireList.add(wire1);
+                addWireToList(wireList, pair.getKey().toString(), res);
                 it.remove();    // avoids a ConcurrentModificationException
             }
         }
@@ -211,8 +196,7 @@ public class Main {
                 val1 = wire.getSignal();
                 int res = val1 << val2;
                 System.out.println(part1 + " - LSHIFT - " + part2 + " wire: " + pair.getKey() + " = " + res);
-                Wire wire1 = new Wire(pair.getKey().toString(), res);
-                wireList.add(wire1);
+                addWireToList(wireList, pair.getKey().toString(), res);
                 it.remove();    // avoids a ConcurrentModificationException
             }
         }
@@ -229,8 +213,7 @@ public class Main {
 
                 System.out.println("to be NOTed: " + varToNot + "(" + val1 + ") wire: " + pair.getKey() + " = " + res);
 
-                Wire wire1 = new Wire(pair.getKey().toString(), res);
-                wireList.add(wire1);
+                addWireToList(wireList, pair.getKey().toString(), res);
                 it.remove();    // avoids a ConcurrentModificationException
             }
         }
