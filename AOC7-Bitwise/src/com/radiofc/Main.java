@@ -4,11 +4,19 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 
+
+
 public class Main {
+
+    public enum ShiftDirection {
+        RIGHT, LEFT
+    }
+
+    ShiftDirection shiftDirection;
 
     public static void main(String[] args) {
 
-        ArrayList<String> instructionList = InputFileReader.readFile("C:\\Users\\eshamcc\\Dropbox\\git\\aoc\\AOC7-Bitwise\\resources\\input3.txt");
+        ArrayList<String> instructionList = InputFileReader.readFile("C:\\Users\\eshamcc\\Dropbox\\git\\aoc\\AOC7-Bitwise\\resources\\input.txt");
 
         ArrayList<Signal> signalList = processInstructions(instructionList);
         ArrayList<Wire> baseSignals = getBaseSignals(signalList);
@@ -74,6 +82,7 @@ public class Main {
         ArrayList<Wire> wireList = new ArrayList<>();
         wireList.addAll(baseSignals);
 
+
         System.out.println("The wires in processMap: ");
         for (Wire w : wireList) {
             System.out.println(w.getIdentifier() + " - " + w.getSignal());
@@ -84,15 +93,15 @@ public class Main {
             String signal = aSignal.getName();
             String wireName = aSignal.getWire();
             if (signal.contains("AND")) {
-                performAndOperation(baseSignals, wireList, wireName, signal);
-         /*   } else if (signal.contains("OR")) {
-                performOrOperation(baseSignals, wireList, it, pair, signal);
+                wireList = performAndOperation(baseSignals, wireList, wireName, signal);
+            } else if (signal.contains("OR")) {
+                wireList = performOrOperation(baseSignals, wireList, wireName, signal);
             } else if (signal.contains("NOT")) {
-                performNotOperation(baseSignals, wireList, it, pair, signal.split(" ")[1]);
+                wireList = performNotOperation(baseSignals, wireList, wireName, signal.split(" ")[1]);
             } else if (signal.contains("LSHIFT")) {
-                performLShiftOperation(baseSignals, wireList, it, pair, signal);
+                wireList = performShiftOperation(baseSignals, wireList, wireName, signal, 1);
             } else if (signal.contains("RSHIFT")) {
-                performRShiftOperation(baseSignals, wireList, it, pair, signal);*/
+                wireList = performShiftOperation(baseSignals, wireList, wireName, signal, 2);
             } else {
                 System.out.println("Signal: " + signal + " wire: " + aSignal.getWire());
 
@@ -133,7 +142,7 @@ public class Main {
         return wireList;
     }
 
-    private static void performAndOperation(ArrayList<Wire> baseSignals, ArrayList<Wire> wireList, String wireName, String signal) {
+    private static ArrayList<Wire> performAndOperation(ArrayList<Wire> baseSignals, ArrayList<Wire> wireList, String wireName, String signal) {
         String part1 = signal.split(" ")[0].toString();
         String part2 = signal.split(" ")[2].toString();
 
@@ -150,11 +159,11 @@ public class Main {
             int res = val1 & val2;
             System.out.println(part1 + " - AND - " + part2 + " wire: " + wireName + " = " + res);
             wireList = addWireToList(wireList, wireName, res);
-          //  it.remove();    // avoids a ConcurrentModificationException
         }
+        return wireList;
     }
 
-    private static void performOrOperation(ArrayList<Wire> baseSignals, ArrayList<Wire> wireList, Iterator it, Map.Entry pair, String signal) {
+    private static ArrayList<Wire> performOrOperation(ArrayList<Wire> baseSignals, ArrayList<Wire> wireList, String wireName, String signal) {
         String part1 = signal.split(" ")[0].toString();
         String part2 = signal.split(" ")[2].toString();
 
@@ -164,13 +173,13 @@ public class Main {
 
         if ((val1 > 0) && (val2 > 0)) {
             int res = val1 | val2;
-            System.out.println(part1 + " - OR - " + part2 + " wire: " + pair.getKey() + " = " + res);
-            addWireToList(wireList, pair.getKey().toString(), res);
-            it.remove();    // avoids a ConcurrentModificationException
+            System.out.println(part1 + " - OR - " + part2 + " wire: " + wireName + " = " + res);
+            wireList = addWireToList(wireList, wireName, res);
         }
+        return wireList;
     }
 
-    private static void performRShiftOperation(ArrayList<Wire> baseSignals, ArrayList<Wire> wireList, Iterator it, Map.Entry pair, String signal) {
+    private static void performRShiftOperation(ArrayList<Wire> baseSignals, ArrayList<Wire> wireList, Map.Entry pair, String signal) {
         String part1 = signal.split(" ")[0].toString();
         String part2 = signal.split(" ")[2].toString();
         int val1 = 0;
@@ -180,13 +189,12 @@ public class Main {
                 val1 = wire.getSignal();
                 int res = val1 >> val2;
                 System.out.println(part1 + " - RSHIFT - " + part2 + " wire: " + pair.getKey() + " = " + res);
-                addWireToList(wireList, pair.getKey().toString(), res);
-                it.remove();    // avoids a ConcurrentModificationException
+                wireList = addWireToList(wireList, pair.getKey().toString(), res);
             }
         }
     }
 
-    private static void performLShiftOperation(ArrayList<Wire> baseSignals, ArrayList<Wire> wireList, Iterator it, Map.Entry pair, String signal) {
+    private static ArrayList<Wire> performShiftOperation(ArrayList<Wire> baseSignals, ArrayList<Wire> wireList, String wireName, String signal, int direction) {
         String part1 = signal.split(" ")[0].toString();
         String part2 = signal.split(" ")[2].toString();
         int val1 = 0;
@@ -194,29 +202,41 @@ public class Main {
         for (Wire wire : baseSignals) {
             if (wire.getIdentifier().equals(part1)) {
                 val1 = wire.getSignal();
-                int res = val1 << val2;
-                System.out.println(part1 + " - LSHIFT - " + part2 + " wire: " + pair.getKey() + " = " + res);
-                addWireToList(wireList, pair.getKey().toString(), res);
-                it.remove();    // avoids a ConcurrentModificationException
+                int res = 0;
+                switch (direction) {
+                    case 1:
+                        res = val1 << val2;
+                        System.out.println(part1 + " - LSHIFT - " + part2 + " wire: " + wireName + " = " + res);
+                        break;
+                    case 2:
+                        res = val1 >> val2;
+                        System.out.println(part1 + " - RSHIFT - " + part2 + " wire: " + wireName + " = " + res);
+                        break;
+                    default:
+                        System.out.println("undefined");
+
+                }
+
+                wireList = addWireToList(wireList, wireName, res);
             }
         }
+        return wireList;
     }
 
-    private static void performNotOperation(ArrayList<Wire> baseSignals, ArrayList<Wire> wireList, Iterator it, Map.Entry pair, String s) {
-        String varToNot = s.toString();
-
+    private static ArrayList<Wire> performNotOperation(ArrayList<Wire> baseSignals, ArrayList<Wire> wireList, String wireName, String varToNot) {
         int val1 = 0;
         for (Wire wire : baseSignals) {
             if (wire.getIdentifier().equals(varToNot)) {
                 val1 = wire.getSignal();
                 int res = 65535 + ~val1 + 1;
 
-                System.out.println("to be NOTed: " + varToNot + "(" + val1 + ") wire: " + pair.getKey() + " = " + res);
+                System.out.println("to be NOTed: " + varToNot + "(" + val1 + ") wire: " + wireName + " = " + res);
 
-                addWireToList(wireList, pair.getKey().toString(), res);
-                it.remove();    // avoids a ConcurrentModificationException
+                wireList = addWireToList(wireList, wireName, res);
+
             }
         }
+        return wireList;
     }
 
     private static boolean isInteger(String string) {

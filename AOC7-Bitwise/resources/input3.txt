@@ -1,0 +1,8 @@
+123 -> x
+456 -> y
+127 -> d
+345 -> e
+x AND d -> f
+y AND e -> h
+NOT y -> i
+x OR y -> t
