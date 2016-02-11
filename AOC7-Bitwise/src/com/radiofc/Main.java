@@ -2,6 +2,7 @@ package com.radiofc;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.ListIterator;
 import java.util.Map;
 
 
@@ -16,7 +17,7 @@ public class Main {
 
     public static void main(String[] args) {
 
-        ArrayList<String> instructionList = InputFileReader.readFile("C:\\Users\\eshamcc\\Dropbox\\git\\aoc\\AOC7-Bitwise\\resources\\input.txt");
+        ArrayList<String> instructionList = InputFileReader.readFile("C:\\Users\\eshamcc\\Dropbox\\git\\aoc\\AOC7-Bitwise\\resources\\input2.txt");
 
         ArrayList<Signal> signalList = processInstructions(instructionList);
         ArrayList<Wire> baseSignals = getBaseSignals(signalList);
@@ -26,10 +27,10 @@ public class Main {
         for (Wire w : allSignals) {
            System.out.println(w.getIdentifier() + " - " + w.getSignal());
         }
-        int a = 123;
+      /*  int a = 123;
         int b = 127;
         int c = a & b;
-        System.out.println("a & b: " + c);
+        System.out.println("a & b: " + c);*/
     }
 
     private static ArrayList<Signal> processInstructions(ArrayList<String> instructionList) {
@@ -89,33 +90,66 @@ public class Main {
         }
         System.out.println("+++++++++++++++++++++++++++++++++");
 
-        for (Signal aSignal : signalList) {
+        Iterator<Signal> listIterator = signalList.iterator();
+       // while (!signalList.isEmpty()) {
+       // for (Signal aSignal : signalList) {
+        while (listIterator.hasNext()) {
+            Signal aSignal = listIterator.next();
             String signal = aSignal.getName();
             String wireName = aSignal.getWire();
             if (signal.contains("AND")) {
+                int listCount = wireList.size();
                 wireList = performAndOperation(baseSignals, wireList, wireName, signal);
+                if (wireList.size() > listCount) {
+                    listIterator.remove();
+                }
             } else if (signal.contains("OR")) {
+                int listCount = wireList.size();
                 wireList = performOrOperation(baseSignals, wireList, wireName, signal);
+                if (wireList.size() > listCount) {
+                    listIterator.remove();
+                }
             } else if (signal.contains("NOT")) {
+                int listCount = wireList.size();
                 wireList = performNotOperation(baseSignals, wireList, wireName, signal.split(" ")[1]);
+                if (wireList.size() > listCount) {
+                    listIterator.remove();
+                }
             } else if (signal.contains("LSHIFT")) {
+                int listCount = wireList.size();
                 wireList = performShiftOperation(baseSignals, wireList, wireName, signal, 1);
+                if (wireList.size() > listCount) {
+                    listIterator.remove();
+                }
             } else if (signal.contains("RSHIFT")) {
+                int listCount = wireList.size();
                 wireList = performShiftOperation(baseSignals, wireList, wireName, signal, 2);
+                if (wireList.size() > listCount) {
+                    listIterator.remove();
+                }
             } else {
                 System.out.println("Signal: " + signal + " wire: " + aSignal.getWire());
 
                 if (isInteger(signal)) {
+                    int listCount = wireList.size();
                     addWireToList(wireList, aSignal.getWire(), Integer.parseInt(signal));
+                    if (wireList.size() > listCount) {
+                        listIterator.remove();
+                    }
                 } else {
+                    boolean gotIt = false;
                     for (Wire wire : baseSignals) {
                         if (wire.getIdentifier().equals(signal)) {
                             addWireToList(wireList, aSignal.getWire(), wire.getSignal());
+                            listIterator.remove();
                           //  it.remove();
+                            gotIt = true;
                             break;
                         }
                     }
-
+                    if (!gotIt) {
+                        System.out.println("No match :(");
+                    }
                 }
 
             }
@@ -179,20 +213,6 @@ public class Main {
         return wireList;
     }
 
-    private static void performRShiftOperation(ArrayList<Wire> baseSignals, ArrayList<Wire> wireList, Map.Entry pair, String signal) {
-        String part1 = signal.split(" ")[0].toString();
-        String part2 = signal.split(" ")[2].toString();
-        int val1 = 0;
-        int val2 = Integer.parseInt(part2);
-        for (Wire wire : baseSignals) {
-            if (wire.getIdentifier().equals(part1)) {
-                val1 = wire.getSignal();
-                int res = val1 >> val2;
-                System.out.println(part1 + " - RSHIFT - " + part2 + " wire: " + pair.getKey() + " = " + res);
-                wireList = addWireToList(wireList, pair.getKey().toString(), res);
-            }
-        }
-    }
 
     private static ArrayList<Wire> performShiftOperation(ArrayList<Wire> baseSignals, ArrayList<Wire> wireList, String wireName, String signal, int direction) {
         String part1 = signal.split(" ")[0].toString();
