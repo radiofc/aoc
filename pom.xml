@@ -3,7 +3,7 @@
 	http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.radiofc</groupId>
-    <artifactId>AOC8-Strings</artifactId>
+    <artifactId>AOC9-Distances</artifactId>
     <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
     <url>http://maven.apache.org</url>
